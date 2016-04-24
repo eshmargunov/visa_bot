@@ -36,8 +36,7 @@ def is_reserve_open():
 
 
 def status(bot, update):
-    request = requests.post(url=URL, data=get_body(), headers=HEADERS)
-    bot.sendMessage(update.message.chat_id, text=request.status_code)
+    bot.sendMessage(update.message.chat_id, text=get_status_from_visa())
 
 
 def unknown_command(bot, update):
