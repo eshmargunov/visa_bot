@@ -60,11 +60,15 @@ def unsubscribe(bot, update):
 # Get status from server every n second. It's a job queue.
 def job_open_reserve(bot):
     if is_reserve_open():
-        for user in users:
+        # Make copy of users set to avoid "Set changed size during iteration" error
+        subscribed_users = users.copy()
+        for user in subscribed_users:
             bot.sendMessage(user, text="OPEN!")
             # TODO: Need refactor!
             users.remove(user)
             bot.sendMessage(user, text="You unsubscribed!")
+
+        del subscribed_users
 
 
 def main():
