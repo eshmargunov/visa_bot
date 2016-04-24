@@ -24,14 +24,6 @@ def get_body():
     return body
 
 
-# Decorator for send result of any function via messageSend from telegram api.
-def sender(fn):
-    def wrapper(bot, update):
-        result = fn()
-        bot.sendMessage(update.message.chat_id, text=str(result))
-    return wrapper
-
-
 def get_status_from_visa():
     body = get_body()
     request = requests.post(url=URL, data=body, headers=HEADERS)
@@ -41,6 +33,15 @@ def get_status_from_visa():
 def is_reserve_open():
     status = get_status_from_visa()
     return status != 200
+
+
+def status(bot, update):
+    request = requests.post(url=URL, data=get_body(), headers=HEADERS)
+    bot.sendMessage(update.message.chat_id, text=request.status_code)
+
+
+def unknown_command(bot, update):
+    bot.sendMessage(update.message.chat_id, text="Unknown command")
 
 
 def subscribe(bot, update):
@@ -76,9 +77,10 @@ def main():
     dp = updater.dispatcher
 
     # Add handlers for Telegram messages
-    dp.addTelegramCommandHandler("get_status", sender(get_status_from_visa))
+    dp.addTelegramCommandHandler("status", status)
     dp.addTelegramCommandHandler("subscribe", subscribe)
     dp.addTelegramCommandHandler("unsubscribe", unsubscribe)
+    dp.addUnknownTelegramCommandHandler(unknown_command)
 
     updater.start_polling()
 
